@@ -1,0 +1,30 @@
+{
+    "shop": [
+        {
+            "name": "Woda",
+            "price": "-",
+            "zone": 5,
+            "priority": 2,
+            "quantity": 6,
+            "taken": 0,
+            "id": 2
+        },
+        {
+            "name": "Soy milk",
+            "price": "-",
+            "zone": 4,
+            "priority": 4,
+            "quantity": 2,
+            "taken": 0,
+            "id": 3
+        },
+        {
+            "name": "Test",
+            "price": "1",
+            "zone": "1",
+            "priority": "1",
+            "quantity": "1",
+            "taken": "1"
+        }
+    ]
+}
