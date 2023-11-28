@@ -1,5 +1,4 @@
 import requests
-import json
 
 
 def sorting(thing):
@@ -9,9 +8,9 @@ def sorting(thing):
 class ApiConnection:
 
     def __init__(self, api):
-        with open('data.json', "r") as file:
-            self.data = json.load(file)
+        self.data = None
         self.api = api
+        self.synch_data()
 
     # function to add product to data offline
     def add_data(self, name, price, zone, priority, quantity, taken):
@@ -37,10 +36,7 @@ class ApiConnection:
 
     # getting json data from google sheets deleting current
     def synch_data(self):
-        data_online = requests.get(url=f'{self.api}').json()
-        with open('data.json', "w") as file:
-            json.dump(data_online, fp=file, indent=4)
-        self.data = data_online
+        self.data = requests.get(url=f'{self.api}').json()
 
     def update(self):
         update_data = []
@@ -53,8 +49,5 @@ class ApiConnection:
         # TODO: how to update online and note wipe out data
 
     # pushing data online
-    def push(self):
-        # x = requests.post(url=api, json=self.data)
-        x = requests.post(url=self.api, json=self.data)
-        print(x.text, self.data)
+
     # function that will sort our dicts based on zone and then priority
