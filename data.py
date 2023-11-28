@@ -8,14 +8,14 @@ def sorting(thing):
 
 class ApiConnection:
 
-    def __init__(self):
+    def __init__(self, api):
         with open('data.json', "r") as file:
             self.data = json.load(file)
+        self.api = api
 
     # function to add product to data offline
     def add_data(self, name, price, zone, priority, quantity, taken):
-        self.data['shop'].append(
-                {
+        new = {
                     'name': name,
                     'price': price,
                     'zone': zone,
@@ -23,13 +23,21 @@ class ApiConnection:
                     'quantity': quantity,
                     'taken': taken
                 }
-        )
-        with open('data.json', 'w') as file:
-            json.dump(self.data, fp=file, indent=4)
+        # checking name in every index of list to see if there is our new element
+        # if not appending to list
+        for x in range(len(self.data['list'])):
+            if new['name'] != self.data['list'][x]['name']:
+                if x == len(self.data['list'])-1:
+                    self.data['list'].append(new)
+                    with open('data.json', 'w') as file:
+                        json.dump(self.data, fp=file, indent=4)
+                    requests.post(url=self.api, json=self.data)
+            else:
+                break
 
     # getting json data from google sheets deleting current
-    def synch_data(self, api):
-        data_online = requests.get(url=f'{api}').json()
+    def synch_data(self):
+        data_online = requests.get(url=f'{self.api}').json()
         with open('data.json', "w") as file:
             json.dump(data_online, fp=file, indent=4)
         self.data = data_online
@@ -38,9 +46,15 @@ class ApiConnection:
         update_data = []
         # gets only data with taken = '1'
         # (to not wipe out progress of another person using same app / sheets)
-        for part in self.data['shop']:
+        for part in self.data['list']:
             if part['taken'] == '1':
                 update_data.append(part)
-        # print(update_data)
+        print(update_data)
         # TODO: how to update online and note wipe out data
+
+    # pushing data online
+    def push(self):
+        # x = requests.post(url=api, json=self.data)
+        x = requests.post(url=self.api, json=self.data)
+        print(x.text, self.data)
     # function that will sort our dicts based on zone and then priority

@@ -1,8 +1,8 @@
 {
-    "shop": [
+    "list": [
         {
             "name": "Woda",
-            "price": "-",
+            "price": 0,
             "zone": 5,
             "priority": 2,
             "quantity": 6,
@@ -11,7 +11,7 @@
         },
         {
             "name": "Soy milk",
-            "price": "-",
+            "price": 0,
             "zone": 4,
             "priority": 4,
             "quantity": 2,
@@ -19,12 +19,12 @@
             "id": 3
         },
         {
-            "name": "Test",
-            "price": "1",
-            "zone": "1",
-            "priority": "1",
-            "quantity": "1",
-            "taken": "1"
+            "name": "Test1",
+            "price": 1,
+            "zone": 1,
+            "priority": 1,
+            "quantity": 1,
+            "taken": 1
         }
     ]
 }
