@@ -13,8 +13,8 @@ class ApiConnection:
         self.api = api
         self.synch_data()
 
-    # function to add product to data offline
-    def add_data(self, name, price, zone, priority, quantity, taken):
+    # function to add product to data
+    def add_data(self, name: str, price: int, zone: int, priority: int, quantity: int, taken: int) -> None:
         new = {
             "list": {
                 'name': name,
@@ -22,7 +22,8 @@ class ApiConnection:
                 'zone': zone,
                 'priority': priority,
                 'quantity': quantity,
-                'taken': taken
+                'taken': taken,
+                'id': 0
             }
         }
         # checking name in every index of list to see if there is our new element
@@ -31,28 +32,35 @@ class ApiConnection:
             if new['list']['name'] != self.data['list'][x]['name']:
                 if x == len(self.data['list']) - 1:
                     # self.data['list'].append(new['list'])
-                    msg = requests.post(url=self.api, json=new)
+                    new['list']['id'] = x
+                    requests.post(url=self.api, json=new)
+                    # or make it only local? but what with id?
                     self.synch_data()
-                    print(msg)
             else:
                 break
 
     # getting json data from google sheets deleting current
-    def synch_data(self):
+    def synch_data(self) -> None:
         self.data = requests.get(url=f'{self.api}').json()
 
-    def update_taken(self):
+    # function to change locally statistics of singular product
+    def update_part(self, part):
+        pass
+
+    def update_taken(self) -> None:
         # gets only data with taken = '1'
         # (to not wipe out progress of another person using same app / sheets)
         for part in self.data['list']:
             if part['taken'] == 1:
                 self.update(part)
 
-    def update_all(self):
+    def update_all(self) -> None:
         for part in self.data['list']:
             self.update(part)
 
-    def update(self, part):
+    # function that completes update_all() and update taken()
+    # its purpose is to update singular part
+    def update(self, part: dict) -> None:
         upd = {"list": {
             'name': part['name'],
             'price': part['price'],
