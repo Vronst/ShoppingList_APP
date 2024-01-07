@@ -1,3 +1,4 @@
+import json
 import requests
 
 
@@ -11,7 +12,19 @@ class ApiConnection:
     def __init__(self, api):
         self.data = None
         self.api = api
-        self.synch_data()
+        try:
+            with open('data.json', 'r') as file:
+                self.data = json.load(fp=file)
+        except FileNotFoundError:
+            self.synch_data()
+
+    def save_it(self) -> None:
+        with open("data.json", 'w') as file:
+            json.dump(self.data, file, indent=4)
+
+    def load_it(self) -> None:
+        with open("data.json", 'r') as file:
+            self.data = json.load(file)
 
     # function to add product to data
     def add_data(self, name: str, price: int, zone: int, priority: int, quantity: int, taken: int) -> None:
@@ -42,13 +55,14 @@ class ApiConnection:
     # getting json data from google sheets deleting current
     def synch_data(self) -> None:
         self.data = requests.get(url=f'{self.api}').json()
+        self.save_it()
 
     # function to change locally statistics of singular product
     def update_part(self, part):
         pass
 
+    # gets only data with taken = '1'
     def update_taken(self) -> None:
-        # gets only data with taken = '1'
         # (to not wipe out progress of another person using same app / sheets)
         for part in self.data['list']:
             if part['taken'] == 1:
