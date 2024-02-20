@@ -36,18 +36,39 @@ class Menu(ScreenManager):
         super().__init__(**kwargs)
         Clock.schedule_once(self.fetch_data)
 
-    def fetch_data(self, obj):
+    def fetch_data(self, obj=None):
         try:
             keys = store.keys()
+            zones = []
+            details = {}
             for key in keys:
-                layout = self.ids.layout(key)
-                self.ids.gridLayout.addWidget(layout)
+                # get key and use it to acquire zone
+                print(store.get(key)["data"]["zone"])
+                zone_info = store.get(key)["data"]["zone"]
+                if zone_info not in zones:
+                    zones.append(zone_info)
+                    # make place for that zone in dictionary
+                    details[zone_info] = []
+                details[zone_info].append(store.get(key)["data"])
+            zones = sorted(zones)
+            for zone in zones:
+                label = Label(text="Zone " + str(zone), size_hint=(1, None), height=dp(80))
+                self.ids.gridLayout.add_widget(label)
+                for detail in details[zone]:
+                    print(detail)
+                    layout = self.list_point(detail)
+                    self.ids.gridLayout.add_widget(layout)
         except Exception as e:
             print(e)
 
-    def go_list(self):
+    def go_list(self, obj=None):
         self.transition.direction = "left"
+        # TODO: here need to make something to load data
         self.current = 'list'
+
+    def go_detail(self, obj=None):
+        self.transition.direction = "left"
+        self.current = 'detail'
 
     def go_main(self):
         self.transition.direction = "right"
@@ -61,9 +82,8 @@ class Menu(ScreenManager):
             spacing=dp(10),
             padding=dp(5)
         )
-        data = key["data"]
-        btn = Button(text=data["name"])
-        lbl = Label(text=data["quantity"], size_hint=(.3, 1))
+        btn = Button(text=key["name"], on_release=self.go_detail)
+        lbl = Label(text="x" + str(key["quantity"]), size_hint=(.3, 1))
         layout.add_widget(btn)
         layout.add_widget(lbl)
         return layout
@@ -88,6 +108,7 @@ class Menu(ScreenManager):
         print(req_body, result, type(result), list(result.keys())[0], sep="\n```````````````````````\n")
         for data in result[list(result.keys())[0]]:
             store.put(key=data["id"], data=data)
+        self.fetch_data()
 
     # def show_popup(self):
         # layout = BoxLayout(orientation='vertical', padding=dp(16), spacing=dp(10))
