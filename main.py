@@ -9,6 +9,8 @@ API = os.environ.get('API')
 kv = Builder.load_file("ui.kv")
 
 root = ApiConnection(API)
+
+
 # data_online = requests.get(url=f'{API}').json()
 # print(data_online)
 # app.synch_data()
@@ -25,3 +27,7 @@ class Menu(BoxLayout):
 class ShoppingApp(App):
     def build(self):
         return kv
+
+
+if __name__ == '__main__':
+    ShoppingApp().run()

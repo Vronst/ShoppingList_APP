@@ -2,6 +2,8 @@ import json
 import requests
 
 
+# kivy works with UrlRequests so needed edits
+
 # function that will sort our dicts based on zone and then priority
 def sorting(thing):
     return thing['zone'], thing['priority']
