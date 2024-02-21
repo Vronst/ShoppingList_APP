@@ -42,3 +42,25 @@ Menu:
                 on_release: root.go_main()
     Screen:
         name: "detail"
+        BoxLayout:
+            orientation: "vertical"
+            ScrollView:
+                do_scroll_y: True
+                id: detail_screen
+
+
+
+
+
+            Button:
+                size_hint: 1, None
+                height: dp(70)
+                pos_hint: {"center_x":  0.5}
+                text: "Save"
+                on_release: root.save_data()
+            Button:
+                size_hint: 1, None
+                height: dp(50)
+                pos_hint: {"center_x":  0.5}
+                text: "Back"
+                on_release: root.go_list_r()
