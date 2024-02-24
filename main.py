@@ -7,10 +7,8 @@ from kivy.lang import Builder
 from kivy.metrics import dp
 from kivy.storage.jsonstore import JsonStore
 from kivy.uix.boxlayout import BoxLayout
-# from data import ApiConnection
 from kivy.app import App
 from kivy.uix.button import Button
-from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager
@@ -73,29 +71,27 @@ class Menu(ScreenManager):
                     details[zone_info] = []
                 details[zone_info].append(store.get(key)["data"])
                 # data looks like {"1": [{"name":...., "name"...., ....}]
-            # print(details)
-            # Posortuj listy w każdym kluczu według priorytetu
+            # sorting by priority
             for key in details:
                 details[key] = sorted(details[key], key=lambda x: x['priority'])
             zones = sorted(zones)
             for zone in zones:
-                label = Label(text="Zone " + str(zone), size_hint=(1, None), height=dp(80))
+                label = Label(text="Zone " + str(zone), size_hint=(1, None), height=dp(80), color=(0, 0, 1, 1))
                 self.ids.gridLayout.add_widget(label)
 
                 for detail in details[zone]:
-                    # print(detail["taken"])
                     if str(detail['taken']) == "0":
                         expense += int(detail['price'])
                         layout = self.list_point(detail)
                         self.ids.gridLayout.add_widget(layout)
                     else:
                         taken.append(detail)
-            label = Label(text="Taken", size_hint=(1, None), height=dp(80))
-            self.ids.gridLayout.add_widget(label)
-            for detail in taken:
-                # print(detail)
-                layout = self.list_point(detail)
-                self.ids.gridLayout.add_widget(layout)
+            if taken:
+                label = Label(text="Taken", size_hint=(1, None), height=dp(80), color=(0, 1, 0, 1))
+                self.ids.gridLayout.add_widget(label)
+                for detail in taken:
+                    layout = self.list_point(detail)
+                    self.ids.gridLayout.add_widget(layout)
             self.ids.expense.text = str(expense) + " PLN"
 
         except Exception as e:
