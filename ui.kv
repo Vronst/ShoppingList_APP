@@ -12,9 +12,11 @@ Menu:
             Button:
                 font_size: dp(30)
                 text: "Add to list"
+                on_release: root.go_add()
             Button:
                 font_size: dp(30)
                 text: "Update"
+                on_release: root.upload_data()
             Button:
                 font_size: dp(30)
                 text: "Synchronise"
@@ -33,7 +35,12 @@ Menu:
                     size_hint: 1, None
                     height: self.minimum_height
                     cols: 1
-
+            Label:
+                id: expense
+                text: ""
+                size_hint: 1, None
+                height: dp(50)
+                pos_hint: {"center_x":  0.5}
             Button:
                 size_hint: 1, None
                 height: dp(50)
@@ -48,7 +55,11 @@ Menu:
                 do_scroll_y: True
                 id: detail_screen
 
-
+                GridLayout:
+                    id: main_layout
+                    cols: 1
+                    size_hint: 1, None
+                    height: self.minimum_height
 
 
 
@@ -58,6 +69,110 @@ Menu:
                 pos_hint: {"center_x":  0.5}
                 text: "Save"
                 on_release: root.save_data()
+            Button:
+                size_hint: 1, None
+                height: dp(55)
+                text: "Delete"
+                on_press: root.start_deleting()
+
+            Button:
+                size_hint: 1, None
+                height: dp(50)
+                pos_hint: {"center_x":  0.5}
+                text: "Back"
+                on_release: root.go_list_r()
+    Screen:
+        name: "add"
+        BoxLayout:
+            orientation: "vertical"
+            ScrollView:
+                do_scroll_y: True
+                GridLayout:
+                    cols: 1
+                    size_hint: 1, None
+                    height: self.minimum_height
+                    BoxLayout:
+                        orientation: "horizontal"
+                        size_hint: 1, None
+                        height: dp(80)
+                        spacing: dp(10)
+                        padding: dp(5)
+                        Label:
+                            id: name_label
+                            text: 'Name:'
+                        TextInput:
+                            id: name_input
+                            text: ''
+                    BoxLayout:
+                        orientation: "horizontal"
+                        size_hint: 1, None
+                        height: dp(80)
+                        spacing: dp(10)
+                        padding: dp(5)
+                        Label:
+                            id: price_label
+                            text: 'Price:'
+                        TextInput:
+                            id: price_input
+                            text: ''
+                    BoxLayout:
+                        orientation: "horizontal"
+                        size_hint: 1, None
+                        height: dp(80)
+                        spacing: dp(10)
+                        padding: dp(5)
+                        Label:
+                            id: zone_label
+                            text: 'Zone:'
+                        TextInput:
+                            id: zone_input
+                            text: ''
+                    BoxLayout:
+                        orientation: "horizontal"
+                        size_hint: 1, None
+                        height: dp(80)
+                        spacing: dp(10)
+                        padding: dp(5)
+                        Label:
+                            id: priority_label
+                            text: 'Priority:'
+                        TextInput:
+                            id: priority_input
+                            text: ''
+                    BoxLayout:
+                        orientation: "horizontal"
+                        size_hint: 1, None
+                        height: dp(80)
+                        spacing: dp(10)
+                        padding: dp(5)
+                        Label:
+                            id: quantity_label
+                            text: 'Quantity:'
+                        TextInput:
+                            id: quantity_input
+                            text: ''
+                    BoxLayout:
+                        orientation: "horizontal"
+                        size_hint: 1, None
+                        height: dp(80)
+                        spacing: dp(10)
+                        padding: dp(5)
+                        Label:
+                            id: taken_label
+                            text: 'Taken:'
+                        ToggleButton:
+                            id: taken_button
+                            text: 'Not Taken'
+
+
+
+
+            Button:
+                size_hint: 1, None
+                height: dp(70)
+                pos_hint: {"center_x":  0.5}
+                text: "Add"
+                on_release: root.add_item(name_input.text, price_input.text, zone_input.text, priority_input.text, quantity_input.text, taken_button.text)
             Button:
                 size_hint: 1, None
                 height: dp(50)
