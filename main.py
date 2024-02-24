@@ -17,8 +17,8 @@ from kivy.network.urlrequest import UrlRequest
 from kivy.uix.togglebutton import ToggleButton
 
 store = JsonStore("data.json")
-API = os.environ.get('API')
-
+# API = os.environ.get('API')
+API = JsonStore("api.json")
 
 # root = ApiConnection(API)
 # TODO: use priority to sort
@@ -96,6 +96,20 @@ class Menu(ScreenManager):
 
         except Exception as e:
             print(e)
+
+    def set_api(self):
+        layout = BoxLayout(orientation='vertical', padding=dp(16), spacing=dp(10))
+        btn = Button(text='Set', on_release=self.save_api)
+        self.text_input = TextInput(multiline=False, text=API.get("api")["data"]["link"])
+        # self.ids["api_data"] = self.text_input
+        layout.add_widget(self.text_input)
+        layout.add_widget(btn)
+        self.popup_api = Popup(title="API Link", size_hint=(.8, None), height=dp(180), content=layout)
+        self.popup_api.open()
+
+    def save_api(self, obj=None):
+        API.put(key="api", data={"link": self.text_input.text})
+        self.popup_api.dismiss()
 
     def go_list(self, obj=None):
         self.transition.direction = "left"
@@ -246,16 +260,28 @@ class Menu(ScreenManager):
         self.fetch_data()
 
     def add_item(self, *args):
-        json_data = {
-            "list": {
-                'name': str(args[0]),
-                'price': int(args[1]),
-                'zone': int(args[2]),
-                'priority': int(args[3]),
-                'quantity': int(args[4]),
-                'taken': int(1 if args[5] == "Taken" else 0)
-            }}
-        requests.post(url=API, json=json_data)
+        keys = sorted(store.keys())
+        number = str(int(keys[-1]) + 1)
+        try:
+            json_data = {
+                    'name': str(args[0].text),
+                    'price': int(args[1].text),
+                    'zone': int(args[2].text),
+                    'priority': int(args[3].text),
+                    'quantity': int(args[4].text),
+                    'taken': int(1 if args[5].text == "Taken" else 0)
+                }
+
+            for arg in range(len(args) - 1):
+                args[arg].text = ''
+            args[5].text = "Not Taken"
+            store.put(key=number, data=json_data)
+            # requests.post(url=API, json=json_data)
+            self.modified.append(number)
+        except Exception as e:
+            print(e)
+        self.ids.gridLayout.clear_widgets()
+        self.fetch_data()
         self.transition.direction = "right"
         self.current = "main"
 

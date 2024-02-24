@@ -21,6 +21,10 @@ Menu:
                 font_size: dp(30)
                 text: "Synchronise"
                 on_release: root.synchronise()
+            Button:
+                font_size: dp(30)
+                text: "API link"
+                on_release: root.set_api()
 
 
     Screen:
@@ -160,7 +164,7 @@ Menu:
                         Label:
                             id: taken_label
                             text: 'Taken:'
-                        ToggleButton:
+                        MyToggleButton:
                             id: taken_button
                             text: 'Not Taken'
 
@@ -172,10 +176,10 @@ Menu:
                 height: dp(70)
                 pos_hint: {"center_x":  0.5}
                 text: "Add"
-                on_release: root.add_item(name_input.text, price_input.text, zone_input.text, priority_input.text, quantity_input.text, taken_button.text)
+                on_release: root.add_item(name_input, price_input, zone_input, priority_input, quantity_input, taken_button)
             Button:
                 size_hint: 1, None
                 height: dp(50)
                 pos_hint: {"center_x":  0.5}
                 text: "Back"
-                on_release: root.go_list_r()
+                on_release: root.go_main()
