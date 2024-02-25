@@ -1,4 +1,4 @@
-import os
+# import os
 
 import certifi
 import requests
@@ -20,17 +20,7 @@ store = JsonStore("data.json")
 # API = os.environ.get('API')
 API = JsonStore("api.json")
 
-# root = ApiConnection(API)
-# TODO: use priority to sort
-# TODO: upload it to base (without overwriting and with
 
-# data_online = requests.get(url=f'{API}').json()
-# print(data_online)
-# app.synch_data()
-# app.add_data('test', 0, 1, 1, 1, 1)
-# app.data['list'][0]['taken'] = 1
-# app.update_taken()
-# app.update_all()
 class MyToggleButton(ToggleButton):
     def __init__(self, **kwargs):
         super(MyToggleButton, self).__init__(**kwargs)
@@ -63,7 +53,6 @@ class Menu(ScreenManager):
             # getting keys so we can find what we need
             for key in keys:
                 # get key and use it to acquire zone
-                # print(store.get(key)["data"]["zone"])
                 zone_info = store.get(key)["data"]["zone"]
                 if zone_info not in zones:
                     zones.append(zone_info)
@@ -95,13 +84,12 @@ class Menu(ScreenManager):
             self.ids.expense.text = str(expense) + " PLN"
 
         except Exception as e:
-            print(e)
+            self.exception_popup(exceptcion_=e)
 
     def set_api(self):
         layout = BoxLayout(orientation='vertical', padding=dp(16), spacing=dp(10))
         btn = Button(text='Set', on_release=self.save_api)
         self.text_input = TextInput(multiline=False, text=API.get("api")["data"]["link"])
-        # self.ids["api_data"] = self.text_input
         layout.add_widget(self.text_input)
         layout.add_widget(btn)
         self.popup_api = Popup(title="API Link", size_hint=(.8, None), height=dp(180), content=layout)
@@ -113,7 +101,6 @@ class Menu(ScreenManager):
 
     def go_list(self, obj=None):
         self.transition.direction = "left"
-        # TODO: here need to make something to load data
         self.current = 'list'
 
     def go_list_r(self):
@@ -126,7 +113,6 @@ class Menu(ScreenManager):
     def go_detail(self, obj=None):
         self.transition.direction = "left"
         self.detail_point(obj)
-        # self.ids.detail_screen.add_widget(layout)
         self.current = 'detail'
 
     def go_main(self):
@@ -145,7 +131,7 @@ class Menu(ScreenManager):
             spacing=dp(10),
             padding=dp(5)
         )
-        btn = Button(text=key["name"], on_release=self.go_detail)
+        btn = Button(text=self.truncate_string(str(key["name"]), 15), on_release=self.go_detail)
         lbl = Label(text="x" + str(key["quantity"]), size_hint=(.3, 1))
         layout.add_widget(btn)
         layout.add_widget(lbl)
@@ -162,7 +148,6 @@ class Menu(ScreenManager):
             if x["data"]["name"] == key.text:
                 self.details = x["data"]
                 break
-        # main_layout = GridLayout(cols=1, size_hint=(1, None), height=dp(200))
         # preparing menu which will allow editing data
         for detail in self.details:
             if detail == "id":
@@ -176,7 +161,6 @@ class Menu(ScreenManager):
             )
 
             lbl = Label(text=detail, size_hint=(.3, 1))
-            print(detail, self.details[detail])
             if detail == "taken":
                 if str(self.details[detail]) == "1":
                     toggle_name = "Taken"
@@ -204,15 +188,15 @@ class Menu(ScreenManager):
 
     def synchronise(self):
         self.popup_show(0)
-        UrlRequest(url=API,
+        UrlRequest(url=API.get("api")["data"]["link"],
                    method="GET",
                    on_success=self.load_data,
+                   on_error=self.popup.dismiss,
                    req_headers={"Content-Type": "application/json; charset=utf-8"},
                    ca_file=certifi.where(),
                    verify=True)
 
     def load_data(self, req_body, result):
-        # print(req_body, result, type(result), list(result.keys())[0], sep="\n```````````````````````\n")
         store.clear()
         self.ids.gridLayout.clear_widgets()
         for data in result[list(result.keys())[0]]:
@@ -261,16 +245,16 @@ class Menu(ScreenManager):
 
     def add_item(self, *args):
         keys = sorted(store.keys())
-        number = str(int(keys[-1]) + 1)
+        number = str(int(keys[-1]))
         try:
             json_data = {
-                    'name': str(args[0].text),
-                    'price': int(args[1].text),
-                    'zone': int(args[2].text),
-                    'priority': int(args[3].text),
-                    'quantity': int(args[4].text),
-                    'taken': int(1 if args[5].text == "Taken" else 0)
-                }
+                'name': str(args[0].text),
+                'price': int(args[1].text),
+                'zone': int(args[2].text),
+                'priority': int(args[3].text),
+                'quantity': int(args[4].text),
+                'taken': int(1 if args[5].text == "Taken" else 0)
+            }
 
             for arg in range(len(args) - 1):
                 args[arg].text = ''
@@ -279,7 +263,7 @@ class Menu(ScreenManager):
             # requests.post(url=API, json=json_data)
             self.modified.append(number)
         except Exception as e:
-            print(e)
+            self.exception_popup(exceptcion_=e)
         self.ids.gridLayout.clear_widgets()
         self.fetch_data()
         self.transition.direction = "right"
@@ -305,9 +289,15 @@ class Menu(ScreenManager):
             #            req_body=json_data,
             #            ca_file=certifi.where(),
             #            verify=True)
-            requests.put(API + f"/{key}", json=json_data)  # kivy test work for some reason
+            try:
+                requests.put(API.get("api")["data"]["link"] + f"/{key}", json=json_data)  # kivy test work for some reason
+            except Exception as e:
+                self.exception_popup(exceptcion_=e)
         self.popup_show(1)
         self.modified.clear()
+        self.ids.gridLayout.clear_widgets()
+        self.synchronise()
+        self.fetch_data()
 
     def success(self, req, result):
         print(result)
@@ -329,13 +319,23 @@ class Menu(ScreenManager):
     def dismiss_del(self, obj=None):
         self.popup_delete.dismiss()
 
+    def exception_popup(self, obj=None, exceptcion_=None):
+        layout = BoxLayout(orientation="vertical", spacing=dp(10), padding=dp(5))
+        label = Label(text=str(exceptcion_)[:30]+"...")
+        layout.add_widget(label)
+        self.popup_exception = Popup(title="Exception", size_hint=(.8, .5), content=layout, auto_dismiss=True)
+        self.popup_exception.open()
+
     def finish_deleting(self, obj=None):
         keys = store.keys()
         for key in keys:
             # deleting and updating chosen data
             if store.get(key)["data"]["name"] == self.details["name"]:
                 store.delete(key)
-                requests.delete(url=API + f"/{key}")
+                try:
+                    requests.delete(url=API.get("api")["data"]["link"] + f"/{key}")
+                except Exception as e:
+                    self.exception_popup(exceptcion_=e)
                 self.ids.gridLayout.clear_widgets()
                 self.fetch_data()
                 break
